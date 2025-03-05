@@ -32,6 +32,7 @@ const LoginForm = () => {
       password: "",
     },
   });
+
   return (
     <Card className="object-cover">
       <CardHeader className="flex flex-col bg-card justify-center items-center">

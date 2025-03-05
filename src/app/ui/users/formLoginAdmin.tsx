@@ -13,11 +13,14 @@ import { useForm } from "react-hook-form";
 import { UserSchema } from "@/lib/zodSchemas";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminLogin } from "@/lib/data/usersCrud";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useContext } from "react";
+import { AuthContextAdmin } from "@/app/contexts/authcontextAdmin";
 
 const FormLoginAdmin = () => {
+  const { getTokenAdmin } = useContext(AuthContextAdmin);
+
   const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
@@ -25,6 +28,10 @@ const FormLoginAdmin = () => {
       password: "",
     },
   });
+
+  async function handleLoginAdmin(adminData: z.infer<typeof UserSchema>) {
+    await getTokenAdmin(adminData);
+  }
 
   return (
     <div className="rounded-sm flex flex-col h-auto items-center justify-center shadow-lg md:w-[300px]">
@@ -35,7 +42,7 @@ const FormLoginAdmin = () => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(AdminLogin)}
+              onSubmit={form.handleSubmit(handleLoginAdmin)}
               className="space-y-1.5"
             >
               <FormField
@@ -64,7 +71,7 @@ const FormLoginAdmin = () => {
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Informe password"
+                        placeholder="Informe a Senha "
                         type="password"
                       ></Input>
                     </FormControl>

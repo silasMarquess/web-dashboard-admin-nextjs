@@ -21,7 +21,6 @@ const login = async (values: z.infer<typeof UserSchema>) => {
         user,
       }),
     });
-
     console.log(response.body);
     if (!response.ok) throw new Error();
     redirect("/believers/register");
@@ -32,26 +31,6 @@ const login = async (values: z.infer<typeof UserSchema>) => {
 
 const AdminLogin = async (values: z.infer<typeof UserSchema>) => {
   const url = "http://localhost:3001/api/v1/auth/admin";
-  console.log(url);
-  const userAdmin = {
-    email: values.email,
-    password: values.password,
-  };
-
-  const response = await fetch(url, {
-    method: "post",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify({
-      ...userAdmin,
-    }),
-  });
-
-  if (!response.ok) {
-    return response.status;
-  }
-  redirect("/admin/users");
 };
 
 export { login, AdminLogin };

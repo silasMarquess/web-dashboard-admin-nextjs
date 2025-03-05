@@ -2,6 +2,7 @@ import "dotenv/config";
 import type { Metadata } from "next";
 import FontPopins from "./ui/fonts";
 import "./globals.css";
+import AuthContextProvider from "./contexts/authcontextAdmin";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,7 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${FontPopins.className} antialiased`}>{children}</body>
+      <body className={`${FontPopins.className} antialiased`}>
+        <AuthContextProvider>{children}</AuthContextProvider>
+      </body>
     </html>
   );
 }

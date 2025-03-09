@@ -1,9 +1,5 @@
 const BelieverHome = () => {
-  return (
-    <div>
-      <h2>Pagina de home de membros</h2>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default BelieverHome;

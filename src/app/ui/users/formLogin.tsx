@@ -88,7 +88,7 @@ const LoginForm = () => {
             </div>
             <div className="flex flex-row w-full justify-around">
               <Link
-                href={"/admin/login"}
+                href={"/admin/users"}
                 className="text-xs text-foreground text-blue-500"
               >
                 Usuario não cadastrado? clique aqui !

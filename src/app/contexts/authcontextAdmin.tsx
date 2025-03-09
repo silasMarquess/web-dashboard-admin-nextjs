@@ -4,14 +4,14 @@ import React, { createContext, useEffect, useState } from "react";
 import { setCookie, parseCookies } from "nookies";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { UserSchema } from "@/lib/zodSchemas";
+import { UserSchmeaSignIn } from "@/lib/zodSchemas";
 import instanceAxios from "@/lib/data/axios";
 
 type User = {
   email: string;
 };
 
-type SignInData = z.infer<typeof UserSchema>;
+type SignInData = z.infer<typeof UserSchmeaSignIn>;
 
 interface AuthContextAdminProps {
   isAutenticated: boolean;
@@ -34,13 +34,12 @@ export default function AuthContextProvider({
     if (token) {
       async function getUser() {
         try {
-          const response = await instanceAxios({ url: "auth/admin" });
+          const response = await instanceAxios("/auth/admin");
 
           if (!response.statusText)
             throw new Error("Erro ao processar requisição");
 
           const data = await response.data;
-          console.log(`data: ${data.user.email}`);
           setUser(data.user);
         } catch (erro) {
           console.log(erro);
@@ -52,7 +51,7 @@ export default function AuthContextProvider({
 
   //buscar meu token e alterar o estado do componente
   async function getTokenAdmin({ email, password }: SignInData) {
-    const response = await instanceAxios.post("auth/admin", {
+    const response = await instanceAxios.post("/auth/admin", {
       email,
       password,
     });
@@ -60,10 +59,11 @@ export default function AuthContextProvider({
     if (!response.statusText) throw new Error("Comunication Error");
 
     const data = response.data;
+    console.log(data);
 
     const { userAutenticated, token } = data.userAdmin;
 
-    console.log(userAutenticated);
+    //console.log(userAutenticated);
 
     setUser({ email: userAutenticated.email });
 

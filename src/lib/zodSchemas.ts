@@ -28,8 +28,14 @@ const BelieverSchema = z.object({
 });
 
 const UserSchema = z.object({
-  email: z.string().email({ message: "email invalido informado" }),
-  password: z.string().min(6,{message:"senha pelo menos de 3 caracteres"})
+  name: z.string().min(3, { message: "Name must have at least 3 characters" }),
+  email: z.string().email({ message: "Invalidated informed email" }),
+  password: z.string().min(6, { message: "password at least 3 characters" }),
 });
 
-export { BelieverSchema, UserSchema };
+const UserSchmeaSignIn = z.object({
+  email: z.string().email({ message: "invalid email" }),
+  password: z.string().min(3, { message: "Password is obligatory" }),
+});
+
+export { BelieverSchema, UserSchema, UserSchmeaSignIn };

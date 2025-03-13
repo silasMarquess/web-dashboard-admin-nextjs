@@ -2,20 +2,20 @@
 
 import React, { createContext, useEffect, useState } from "react";
 import { setCookie, parseCookies } from "nookies";
-import { redirect } from "next/navigation";
 import { z } from "zod";
-import { UserSchmeaSignIn } from "@/lib/zodSchemas";
+import { UserSchemaSignIn } from "@/lib/zodSchemas";
 import instanceAxios from "@/lib/data/axios";
+import { useRouter } from "next/navigation";
 
 type User = {
   email: string;
 };
 
-type SignInData = z.infer<typeof UserSchmeaSignIn>;
+type SignInData = z.infer<typeof UserSchemaSignIn>;
 
 interface AuthContextAdminProps {
   isAutenticated: boolean;
-  user: User;
+  user: User | null;
   getTokenAdmin(user: User): Promise<void>;
 }
 
@@ -23,19 +23,19 @@ export const AuthContextAdmin = createContext({} as AuthContextAdminProps);
 
 export default function AuthContextProvider({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
-  const [user, setUser] = useState<User>({} as User);
+}>) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
   const isAutenticated = !!user;
 
-  useEffect(function () {
+  useEffect(() => {
     const { token_admin: token } = parseCookies();
-    if (token) {
+    if (!!token) {
       async function getUser() {
         try {
           const response = await instanceAxios("/auth/admin");
-
           if (!response.statusText)
             throw new Error("Erro ao processar requisição");
 
@@ -59,20 +59,18 @@ export default function AuthContextProvider({
     if (!response.statusText) throw new Error("Comunication Error");
 
     const data = response.data;
-    console.log(data);
 
     const { userAutenticated, token } = data.userAdmin;
 
-    //console.log(userAutenticated);
-
     setUser({ email: userAutenticated.email });
-
     //armazenar nos cookies
     setCookie(undefined, "token_admin", token, {
       maxAge: 60 * 60 * 1, //1 hour
     });
 
-    redirect("/admin/users");
+    instanceAxios.defaults.headers["authorization_admin"] = `Bearer ${token}`;
+
+    router.push("/admin/users");
   }
 
   return (

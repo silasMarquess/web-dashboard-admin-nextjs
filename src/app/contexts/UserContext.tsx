@@ -8,7 +8,7 @@ import {
   userCreate,
   UserDelete,
   userUpdate,
-} from "@/lib/data/usersCrud";
+} from "@/lib/data/userAdminCrud";
 
 interface registerContextProps {
   titleForm: string;

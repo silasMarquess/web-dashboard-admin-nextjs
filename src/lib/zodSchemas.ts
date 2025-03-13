@@ -1,15 +1,5 @@
 import { z } from "zod";
-
-enum Category {
-  MEMBER = "MEMBER",
-  CONGRATOR = "CONGREGATOR",
-  WORKER = "WORKER",
-}
-
-enum Status {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-}
+import { Category, Status } from "./data/definitions";
 
 const BelieverSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter no minimo 3 caracteres" }),
@@ -33,9 +23,9 @@ const UserSchema = z.object({
   password: z.string().min(6, { message: "password at least 3 characters" }),
 });
 
-const UserSchmeaSignIn = z.object({
+const UserSchemaSignIn = z.object({
   email: z.string().email({ message: "invalid email" }),
   password: z.string().min(3, { message: "Password is obligatory" }),
 });
 
-export { BelieverSchema, UserSchema, UserSchmeaSignIn };
+export { BelieverSchema, UserSchema, UserSchemaSignIn };

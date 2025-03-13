@@ -15,18 +15,26 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LockKeyhole, Save, X } from "lucide-react";
-import { UserSchema } from "@/lib/zodSchemas";
+import { UserSchema, UserSchemaSignIn } from "@/lib/zodSchemas";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "@/lib/data/usersCrud";
+import { login } from "@/lib/data/userAdminCrud";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useContext } from "react";
+import { AuthContextUsers } from "@/app/contexts/authcontextUsers";
 
 const LoginForm = () => {
-  const form = useForm<z.infer<typeof UserSchema>>({
-    resolver: zodResolver(UserSchema),
+  const { getTokenUser } = useContext(AuthContextUsers);
+
+  async function HandleGetToken(values: z.infer<typeof UserSchemaSignIn>) {
+    await getTokenUser(values);
+  }
+
+  const form = useForm<z.infer<typeof UserSchemaSignIn>>({
+    resolver: zodResolver(UserSchemaSignIn),
     defaultValues: {
       email: "",
       password: "",
@@ -45,7 +53,7 @@ const LoginForm = () => {
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(login)}
+            onSubmit={form.handleSubmit(HandleGetToken)}
             className="flex flex-col flex-auto space-y-2 "
           >
             <FormField
@@ -86,6 +94,7 @@ const LoginForm = () => {
                 Entrar
               </Button>
             </div>
+
             <div className="flex flex-row w-full justify-around">
               <Link
                 href={"/admin/users"}

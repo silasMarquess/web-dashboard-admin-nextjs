@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { UserSchmeaSignIn } from "@/lib/zodSchemas";
+import { UserSchemaSignIn } from "@/lib/zodSchemas";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -21,15 +21,15 @@ import { AuthContextAdmin } from "@/app/contexts/authcontextAdmin";
 const FormLoginAdmin = () => {
   const { getTokenAdmin } = useContext(AuthContextAdmin);
 
-  const form = useForm<z.infer<typeof UserSchmeaSignIn>>({
-    resolver: zodResolver(UserSchmeaSignIn),
+  const form = useForm<z.infer<typeof UserSchemaSignIn>>({
+    resolver: zodResolver(UserSchemaSignIn),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function handleLoginAdmin(adminData: z.infer<typeof UserSchmeaSignIn>) {
+  async function handleLoginAdmin(adminData: z.infer<typeof UserSchemaSignIn>) {
     await getTokenAdmin(adminData);
   }
 

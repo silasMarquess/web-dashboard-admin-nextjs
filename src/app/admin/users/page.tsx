@@ -25,17 +25,20 @@ import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import FormRegisterUser from "@/app/ui/users/formRegister";
-import { getALlUsers } from "@/lib/data/usersCrud";
+import { getALlUsers } from "@/lib/data/userAdminCrud";
 import { userOmitPassword } from "@/lib/data/definitions";
 import { RegisterContext } from "@/app/contexts/UserContext";
 
 export default function PageAdminUsers() {
+  const { user: userAdmin } = useContext(AuthContextAdmin);
+
   const router = useRouter();
   const { getUpdateUser, setOperatonForm, deleteUser } =
     useContext(RegisterContext);
 
   const [isActiveForm, setActiveForm] = useState(false);
   const [allUsers, setAllUsers] = useState<userOmitPassword[] | undefined>([]);
+  const [delOrUpdate, setDelUpdate] = useState(0);
 
   function handleActiveForm() {
     setOperatonForm(1);
@@ -49,8 +52,8 @@ export default function PageAdminUsers() {
   }
 
   function handleDelete(id: string) {
-    router.refresh();
     deleteUser(id);
+    setDelUpdate(delOrUpdate + 1);
   }
 
   useEffect(() => {
@@ -61,18 +64,15 @@ export default function PageAdminUsers() {
       const users = await getALlUsers();
       setAllUsers(users);
     }
-
     handlegetAllUsers();
-  }, [allUsers, setAllUsers]);
-
-  const { user: userAdmin } = useContext(AuthContextAdmin);
+  }, []);
 
   return (
     <div className="flex flex-col w-screen h-screen p-2 space-y-1 justify-start items-center">
       <Card className=" flex w-full flex-col">
         <CardHeader>
           <CardTitle>Tabela de Usuarios</CardTitle>
-          <CardDescription>Admin:{userAdmin?.email}</CardDescription>
+          <CardDescription>Admin: {userAdmin?.email} </CardDescription>
         </CardHeader>
         <CardContent>
           {/*cabeçalho*/}
@@ -86,45 +86,47 @@ export default function PageAdminUsers() {
               Adicionar
             </Button>
           </div>
-          <div className="flex flex-col h-auto w-full object-cover overflow-auto"></div>
-          <Table className="table-auto">
-            <TableCaption>Lista de Usuarios</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">usuario</TableHead>
-                <TableHead>email</TableHead>
-                <TableHead>**</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allUsers?.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-row justify-center object-fill gap-1">
-                      {/**button delete user */}
-                      <Button
-                        size="icon"
-                        onClick={() => {
-                          handleDelete(user.id);
-                        }}
-                      >
-                        <Trash2 />
-                        {/**button edit user */}
-                      </Button>
-                      <Button
-                        size="icon"
-                        onClick={() => handleUpdateUser(user.id)}
-                      >
-                        <UserRoundPen />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="flex flex-col h-auto w-full object-cover ">
+            {" "}
+            <Table className="table-auto">
+              <TableCaption>Lista de Usuarios</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">usuario</TableHead>
+                  <TableHead>email</TableHead>
+                  <TableHead>**</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {allUsers?.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-row justify-center object-fill gap-1">
+                        {/**button delete user */}
+                        <Button
+                          size="icon"
+                          onClick={() => {
+                            handleDelete(user.id);
+                          }}
+                        >
+                          <Trash2 />
+                          {/**button edit user */}
+                        </Button>
+                        <Button
+                          size="icon"
+                          onClick={() => handleUpdateUser(user.id)}
+                        >
+                          <UserRoundPen />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
         <CardFooter>{allUsers?.length} usuarios cadastrados</CardFooter>
       </Card>

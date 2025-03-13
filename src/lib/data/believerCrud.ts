@@ -1,25 +1,33 @@
 import { BelieverSchema } from "../zodSchemas";
 import { z } from "zod";
+import instanceAxios from "./axios";
 
-async function Create(values: z.infer<typeof BelieverSchema>) {
-  const urlApi = process.env.REMOTE_API as string;
-  const object = { ...values };
-  console.log(object);
-
+export const Create = async (values: z.infer<typeof BelieverSchema>) => {
+  const urlApi = "/believers";
   try {
-    const response = await fetch(urlApi, {
-      method: "post",
-      body: JSON.stringify({
-        ...values,
-      }),
+    const response = await instanceAxios.post(urlApi, {
+      ...values,
     });
-
-    if (!response.ok) {
-      throw new Error(`Status: ${response.status}`);
-    }
+    if (!response.statusText) throw new Error("Error");
+    return response;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
-export default Create;
+export const getBelieverById = async (id: string) => {
+  const url = `/believers/${id}`;
+  try {
+  } catch (error) {}
+};
+
+export const findAllBelievers = async () => {
+  const url = `/believers`;
+  try {
+    const response = await instanceAxios(url);
+    if (!response.statusText) throw new Error("Error");
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

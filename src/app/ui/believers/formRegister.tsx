@@ -18,7 +18,6 @@ import {
 import { BelieverSchema } from "@/lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import create from "@/lib/data/believerCrud";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -30,18 +29,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useContext } from "react";
+import { believerContext } from "@/app/contexts/believerContext";
+import { Category, Status } from "@/lib/data/definitions";
+import { useRouter } from "next/navigation";
 
 const CardFormRegister = () => {
+  const router = useRouter();
+  const { BelieverRegister, operation_believer } = useContext(believerContext);
+
   const form = useForm<z.infer<typeof BelieverSchema>>({
     resolver: zodResolver(BelieverSchema),
+    defaultValues: {
+      name: "",
+      surname: "",
+      birth: "",
+      category: Category.MEMBER,
+      status: Status.ACTIVE,
+    },
   });
+
+  async function handleRegisterBeliever(
+    values: z.infer<typeof BelieverSchema>
+  ) {
+    await BelieverRegister(values);
+    handleReset();
+  }
+
+  async function handleReset() {
+    form.reset();
+  }
+
+  async function handleTogoback() {
+    router.push("/believers/list");
+  }
 
   return (
     <div className="flex flex-col shadow-sm rounded-sm object-cover md:max-h-screen md:w-[500px] md:py-5">
       <Card className="bg-card object-cover md:overflow-auto">
         <CardHeader>
           <div className="flex flex-col justify-center items-center space-y-1">
-            <CardTitle>Formulario de Cadastro</CardTitle>
+            <CardTitle>
+              {operation_believer == 1
+                ? "Operação de Cadastro"
+                : "Operação de edição"}
+            </CardTitle>
             <CardDescription>Entre com os dados do membro</CardDescription>
             <hr className="w-full" />
           </div>
@@ -49,7 +81,10 @@ const CardFormRegister = () => {
         <CardContent>
           {/*Formulario de Cadastro */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(create)} className="space-y-1 ">
+            <form
+              onSubmit={form.handleSubmit(handleRegisterBeliever)}
+              className="space-y-1 "
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -57,7 +92,7 @@ const CardFormRegister = () => {
                   <FormItem>
                     <FormLabel>Nome do Membro:</FormLabel>
                     <FormControl>
-                      <Input placeholder="Informe o nome" {...field} />
+                      <Input placeholder="nome do membro" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -70,10 +105,7 @@ const CardFormRegister = () => {
                   <FormItem>
                     <FormLabel>Nome do Membro:</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Informe o segundo nome"
-                        {...field}
-                      ></Input>
+                      <Input placeholder="Sobrenome:" {...field}></Input>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,8 +189,9 @@ const CardFormRegister = () => {
                   </FormItem>
                 )}
               />
+
               <div className="pt-5 flex flex-row w-full justify-between relative bottom-0 left-0">
-                <Button variant={"outline"}>Cancelar</Button>
+                <Button variant={"outline"}>Voltar</Button>
                 <Button type="submit">Cadastrar</Button>
               </div>
             </form>

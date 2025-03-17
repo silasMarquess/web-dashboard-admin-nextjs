@@ -11,24 +11,56 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
-import { UserSchema } from "@/lib/zodSchemas";
+import { UserSchema } from "@/lib/data/zodSchemas";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { RegisterContext } from "@/app/contexts/UserContext";
-import { User } from "@/lib/data/definitions";
+import { userCreate, userUpdate } from "@/lib/data/userAdminCrud";
+import { getErrorMessage } from "@/lib/helpers/getTypeError";
 
 const FormRegisterUser = ({ onClose }: { onClose: () => void }) => {
   const [showPassword, setShowPassword] = useState(false);
-
-  const { CreateUser, titleForm, user, operationForm, UpdateUser } =
-    useContext(RegisterContext);
+  const { titleForm, user, operationForm } = useContext(RegisterContext);
 
   function handlePasswordVisibility() {
     setShowPassword(!showPassword);
+  }
+
+  async function handelCreateNewUser({
+    name,
+    email,
+    password,
+  }: z.infer<typeof UserSchema>) {
+    try {
+      const response = await userCreate({ name, email, password });
+      if (!response.statusText) return alert(getErrorMessage(response.status));
+      const userCreated = await response.data.user;
+      alert(`${userCreated.name} criado com sucesso`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      onClose();
+    }
+  }
+
+  async function handleUpdateUser({
+    name,
+    email,
+    password,
+  }: z.infer<typeof UserSchema>) {
+    try {
+      if (!user) return alert("Usuario nao selecionado");
+      const response = await userUpdate(user?.id, { name, email, password });
+      const userUpdated = await response?.data.UserUpdated;
+      alert(`${userUpdated.name} atualizado com sucesso`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      onClose();
+    }
   }
 
   const form = useForm<z.infer<typeof UserSchema>>({
@@ -41,20 +73,10 @@ const FormRegisterUser = ({ onClose }: { onClose: () => void }) => {
   });
 
   useEffect(() => {
-    if (user) {
-      console.log(user.id);
+    if (user && operationForm == 2) {
       form.reset(user);
     }
-  }, [user, form.reset]);
-
-  function HandleSubmit(values: z.infer<typeof UserSchema>) {
-    if (operationForm == 1) {
-      CreateUser(values);
-    } else {
-      UpdateUser(user?.id as string, values);
-    }
-    onClose();
-  }
+  }, []);
 
   return (
     <div className="fixed w-screen h-screen justify-center items-center gap-2 z-50">
@@ -66,7 +88,9 @@ const FormRegisterUser = ({ onClose }: { onClose: () => void }) => {
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(HandleSubmit)}
+                onSubmit={form.handleSubmit(
+                  operationForm === 1 ? handelCreateNewUser : handleUpdateUser
+                )}
                 className="space-y-2"
               >
                 <FormField

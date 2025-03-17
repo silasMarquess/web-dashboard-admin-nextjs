@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserSchema, UserSchemaSignIn } from "../zodSchemas";
+import { UserSchema, UserSchemaSignIn } from "./zodSchemas";
 import { redirect } from "next/navigation";
 import instanceAxios from "./axios";
 import { userOmitPassword } from "./definitions";

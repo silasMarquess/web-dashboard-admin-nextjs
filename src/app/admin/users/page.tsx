@@ -25,47 +25,66 @@ import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import FormRegisterUser from "@/app/ui/users/formRegister";
-import { getALlUsers } from "@/lib/data/userAdminCrud";
+import { getALlUsers, getUserById, UserDelete } from "@/lib/data/userAdminCrud";
 import { userOmitPassword } from "@/lib/data/definitions";
 import { RegisterContext } from "@/app/contexts/UserContext";
+import { getErrorMessage } from "@/lib/helpers/getTypeError";
 
 export default function PageAdminUsers() {
   const { user: userAdmin } = useContext(AuthContextAdmin);
 
   const router = useRouter();
-  const { getUpdateUser, setOperatonForm, deleteUser } =
-    useContext(RegisterContext);
-
+  const { setOperatonForm, setUser } = useContext(RegisterContext);
   const [isActiveForm, setActiveForm] = useState(false);
   const [allUsers, setAllUsers] = useState<userOmitPassword[] | undefined>([]);
-  const [delOrUpdate, setDelUpdate] = useState(0);
+  const [confirmDelete, setConfirmDelte] = useState(false);
 
   function handleActiveForm() {
     setOperatonForm(1);
     setActiveForm(!isActiveForm);
   }
 
-  function handleUpdateUser(id: string) {
-    getUpdateUser(id);
-    setOperatonForm(2);
-    setActiveForm(!isActiveForm);
+  async function handleDeleteUser(id: string) {
+    try {
+      const conf = confirm("Deseja realmente deletar o usuario selecionado");
+      if (!confirmDelete) return alert("Operação cancelada pelo cliente");
+      const response = await UserDelete(id);
+
+      if (response && !response.statusText)
+        return alert(getErrorMessage(response.status));
+
+      setConfirmDelte(conf);
+      const user = await response?.data.user;
+      alert(`${user.name} deletado da base`);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  function handleDelete(id: string) {
-    deleteUser(id);
-    setDelUpdate(delOrUpdate + 1);
+  async function handleUpdateUser(id: string) {
+    try {
+      const response = await getUserById(id);
+      if (response && !response.statusText)
+        return alert(getErrorMessage(response.status));
+      const user = response?.data.user;
+      setUser(user);
+      setOperatonForm(2);
+      setActiveForm(!isActiveForm);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   useEffect(() => {
     const { token_admin } = parseCookies();
-    if (!token_admin) return router.push("/admin/login");
+    if (!token_admin) router.push("/admin/login");
 
     async function handlegetAllUsers() {
       const users = await getALlUsers();
       setAllUsers(users);
     }
     handlegetAllUsers();
-  }, []);
+  }, [isActiveForm, confirmDelete]);
 
   return (
     <div className="flex flex-col w-screen h-screen p-2 space-y-1 justify-start items-center">
@@ -108,7 +127,7 @@ export default function PageAdminUsers() {
                         <Button
                           size="icon"
                           onClick={() => {
-                            handleDelete(user.id);
+                            handleDeleteUser(user.id);
                           }}
                         >
                           <Trash2 />
@@ -130,9 +149,10 @@ export default function PageAdminUsers() {
         </CardContent>
         <CardFooter>{allUsers?.length} usuarios cadastrados</CardFooter>
       </Card>
+
       {/**formulario suspenso*/}
       {isActiveForm && (
-        <FormRegisterUser onClose={handleActiveForm}></FormRegisterUser>
+        <FormRegisterUser onClose={() => handleActiveForm()}></FormRegisterUser>
       )}
     </div>
   );

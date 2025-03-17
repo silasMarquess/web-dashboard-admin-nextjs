@@ -1,18 +1,18 @@
 import { z } from "zod";
-import { Category, Status } from "./data/definitions";
+import { Category, Status } from "./definitions";
 
 const BelieverSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter no minimo 3 caracteres" }),
   surname: z
     .string()
     .min(3, { message: "Sobrenome deve ter no minimo 3 caracteres" }),
-  birth: z.string().refine(
-    (value) => {
-      const date = new Date(value);
-      return !isNaN(date.getTime());
-    },
-    { message: "Data invalida" }
-  ),
+  birth: z.string().refine((value) => {
+    const dateString = value.split("/");
+    const dataBD = Date.parse(
+      `${dateString[2]}-${dateString[1]}-${dateString[0]}`
+    );
+    return !isNaN(dataBD);
+  }, "Data Invalida"),
   category: z.nativeEnum(Category),
   status: z.nativeEnum(Status),
 });

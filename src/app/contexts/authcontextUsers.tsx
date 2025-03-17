@@ -2,11 +2,11 @@
 
 import React, { createContext, useEffect, useState } from "react";
 import { z } from "zod";
-import { UserSchemaSignIn } from "@/lib/zodSchemas";
+import { UserSchemaSignIn } from "@/lib/data/zodSchemas";
 //import { User } from "@/lib/data/definitions";
 import { getUserByToken, login } from "@/lib/data/usersCrud";
 import { parseCookies, setCookie } from "nookies";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import instanceAxios from "@/lib/data/axios";
 
 type UserSign = z.infer<typeof UserSchemaSignIn>;
@@ -64,7 +64,7 @@ export default function AuthContextUserProvider({
 
     setCookie(undefined, "token", token, {
       maxAge: 60 * 60 * 1,
-      path: "/",
+      path: "/believers",
     });
 
     instanceAxios.defaults.headers["authorization"] = `Bearer ${token}`;

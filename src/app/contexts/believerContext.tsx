@@ -1,24 +1,29 @@
 "use client";
 
-import { Create, findAllBelievers } from "@/lib/data/believerCrud";
-import { Believer } from "@/lib/data/definitions";
-import { BelieverSchema } from "@/lib/zodSchemas";
+import { BelieverSchema } from "@/lib/data/zodSchemas";
 import React, { createContext, useState } from "react";
 import { z } from "zod";
 
-interface believerContextProps {
-  operation_believer: Operation;
-  BelieverRegister: (values: z.infer<typeof BelieverSchema>) => void;
-  believer: Believer | null;
-  setOperation: React.Dispatch<React.SetStateAction<Operation>>;
-  getAllBelievers: () => Promise<Believer[] | null>;
-}
+type BelieverDTO = z.infer<typeof BelieverSchema>;
+
+type BeliverUpdateDTO = {
+  id: string;
+  dataBeliever: BelieverDTO;
+};
 
 enum Operation {
-  REGISTER = 1,
-  UPDATE = 2,
+  registerBeliever = 1,
+  updateBeliever = 2,
 }
 
+interface believerContextProps {
+  textButtonSubmit: string;
+  titleForm: string;
+  operation: Operation;
+  believer: BeliverUpdateDTO | undefined;
+  setBeliever: React.Dispatch<React.SetStateAction<BeliverUpdateDTO>>;
+  setOperation: React.Dispatch<React.SetStateAction<Operation>>;
+}
 export const believerContext = createContext({} as believerContextProps);
 
 export default function BelieverContextProvider({
@@ -26,33 +31,25 @@ export default function BelieverContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [believer, setBeliever] = useState<Believer>({} as Believer);
-  const [operation_believer, setOperation] = useState<Operation>(1);
+  const [believer, setBeliever] = useState<BeliverUpdateDTO>(
+    {} as BeliverUpdateDTO
+  );
 
-  async function BelieverRegister(values: z.infer<typeof BelieverSchema>) {
-    const response = await Create(values);
-    const believer = response?.data.believer;
-    console.log(believer);
-    setBeliever(believer);
-  }
+  const [operation, setOperation] = useState<Operation>(1);
 
-  async function getBelieverUpdate(id: string): Believer | null {}
+  const titleForm =
+    operation === 2 ? "Operação de Atualização" : "Operação de Cadastro";
 
-  async function getAllBelievers(): Promise<Believer[] | null> {
-    const response = await findAllBelievers();
-    console.log(response);
-    const believers = await response?.data.believers;
-    return believers;
-  }
-
+  const textButtonSubmit = operation === 2 ? "Atualizar" : "Cadastrar";
   return (
     <believerContext.Provider
       value={{
+        textButtonSubmit,
         believer,
-        BelieverRegister,
-        operation_believer,
+        setBeliever,
+        titleForm,
+        operation,
         setOperation,
-        getAllBelievers,
       }}
     >
       {children}

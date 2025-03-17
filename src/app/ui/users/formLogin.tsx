@@ -15,18 +15,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LockKeyhole, Save, X } from "lucide-react";
-import { UserSchema, UserSchemaSignIn } from "@/lib/zodSchemas";
+import { UserSchema, UserSchemaSignIn } from "@/lib/data/zodSchemas";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "@/lib/data/userAdminCrud";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContextUsers } from "@/app/contexts/authcontextUsers";
+import { parseCookies } from "nookies";
 
 const LoginForm = () => {
+  const router = useRouter();
   const { getTokenUser } = useContext(AuthContextUsers);
 
   async function HandleGetToken(values: z.infer<typeof UserSchemaSignIn>) {
@@ -40,6 +42,11 @@ const LoginForm = () => {
       password: "",
     },
   });
+
+  useEffect(() => {
+    const { token_admin } = parseCookies();
+    if (!!token_admin) router.push("/believers/list");
+  }, []);
 
   return (
     <Card className="object-cover">

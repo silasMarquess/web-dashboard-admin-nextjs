@@ -10,16 +10,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { UserSchemaSignIn } from "@/lib/zodSchemas";
+import { UserSchemaSignIn } from "@/lib/data/zodSchemas";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useContext } from "react";
 import { AuthContextAdmin } from "@/app/contexts/authcontextAdmin";
+import instanceAxios from "@/lib/data/axios";
+import { setCookie } from "nookies";
+import { useRouter } from "next/navigation";
 
 const FormLoginAdmin = () => {
-  const { getTokenAdmin } = useContext(AuthContextAdmin);
+  const { setUser } = useContext(AuthContextAdmin);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof UserSchemaSignIn>>({
     resolver: zodResolver(UserSchemaSignIn),
@@ -29,10 +33,23 @@ const FormLoginAdmin = () => {
     },
   });
 
-  async function handleLoginAdmin(adminData: z.infer<typeof UserSchemaSignIn>) {
-    await getTokenAdmin(adminData);
+  async function handleTokenAdmin(values: z.infer<typeof UserSchemaSignIn>) {
+    try {
+      const response = await instanceAxios.post("/auth/admin", { ...values });
+      const data = await response.data;
+      const { userAutenticated, token } = data.userAdmin;
+      setUser({ email: userAutenticated.email });
+      //armazenar nos cookies
+      setCookie(undefined, "token_admin", token, {
+        maxAge: 60 * 60 * 1, //1 hour
+        path: "/",
+      });
+      instanceAxios.defaults.headers["authorization_admin"] = `Bearer ${token}`;
+      router.push("/admin/users");
+    } catch (error) {
+      console.log(error);
+    }
   }
-
   return (
     <div className="rounded-sm flex flex-col h-auto items-center justify-center shadow-lg md:w-[300px]">
       <Card className="flex flex-col overflow-auto h-full w-full ">
@@ -42,7 +59,7 @@ const FormLoginAdmin = () => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleLoginAdmin)}
+              onSubmit={form.handleSubmit(handleTokenAdmin)}
               className="space-y-1.5"
             >
               <FormField
@@ -80,7 +97,14 @@ const FormLoginAdmin = () => {
                 )}
               />
               <div className="flex flex-row w-full justify-between items-center mb-0">
-                <Button variant={"outline"}>Voltar</Button>
+                <Button
+                  variant={"outline"}
+                  onClick={() => {
+                    router.push("/");
+                  }}
+                >
+                  Voltar
+                </Button>
                 <Button className="bg-primary" type="submit">
                   Entrar
                 </Button>

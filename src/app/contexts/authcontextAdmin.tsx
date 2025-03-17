@@ -1,22 +1,17 @@
 "use client";
 
 import React, { createContext, useEffect, useState } from "react";
-import { setCookie, parseCookies } from "nookies";
-import { z } from "zod";
-import { UserSchemaSignIn } from "@/lib/zodSchemas";
 import instanceAxios from "@/lib/data/axios";
-import { useRouter } from "next/navigation";
+import { parseCookies } from "nookies";
 
 type User = {
   email: string;
 };
 
-type SignInData = z.infer<typeof UserSchemaSignIn>;
-
 interface AuthContextAdminProps {
   isAutenticated: boolean;
   user: User | null;
-  getTokenAdmin(user: User): Promise<void>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 export const AuthContextAdmin = createContext({} as AuthContextAdminProps);
@@ -26,7 +21,6 @@ export default function AuthContextProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const isAutenticated = !!user;
 
@@ -38,7 +32,6 @@ export default function AuthContextProvider({
           const response = await instanceAxios("/auth/admin");
           if (!response.statusText)
             throw new Error("Erro ao processar requisição");
-
           const data = await response.data;
           setUser(data.user);
         } catch (erro) {
@@ -50,31 +43,9 @@ export default function AuthContextProvider({
   }, []);
 
   //buscar meu token e alterar o estado do componente
-  async function getTokenAdmin({ email, password }: SignInData) {
-    const response = await instanceAxios.post("/auth/admin", {
-      email,
-      password,
-    });
-
-    if (!response.statusText) throw new Error("Comunication Error");
-
-    const data = response.data;
-
-    const { userAutenticated, token } = data.userAdmin;
-
-    setUser({ email: userAutenticated.email });
-    //armazenar nos cookies
-    setCookie(undefined, "token_admin", token, {
-      maxAge: 60 * 60 * 1, //1 hour
-    });
-
-    instanceAxios.defaults.headers["authorization_admin"] = `Bearer ${token}`;
-
-    router.push("/admin/users");
-  }
 
   return (
-    <AuthContextAdmin.Provider value={{ isAutenticated, getTokenAdmin, user }}>
+    <AuthContextAdmin.Provider value={{ isAutenticated, setUser, user }}>
       {children}
     </AuthContextAdmin.Provider>
   );

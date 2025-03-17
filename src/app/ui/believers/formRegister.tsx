@@ -15,13 +15,13 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { BelieverSchema } from "@/lib/zodSchemas";
+import { BelieverSchema } from "@/lib/data/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { InputMask } from "primereact/inputmask";
+import { PatternFormat } from "react-number-format";
 import {
   Select,
   SelectContent,
@@ -29,31 +29,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { believerContext } from "@/app/contexts/believerContext";
-import { Category, Status } from "@/lib/data/definitions";
 import { useRouter } from "next/navigation";
+import { Create, updatedAtBeliever } from "@/lib/data/believerCrud";
 
 const CardFormRegister = () => {
   const router = useRouter();
-  const { BelieverRegister, operation_believer } = useContext(believerContext);
+  const { believer, titleForm, textButtonSubmit, operation } =
+    useContext(believerContext);
 
   const form = useForm<z.infer<typeof BelieverSchema>>({
     resolver: zodResolver(BelieverSchema),
     defaultValues: {
       name: "",
       surname: "",
-      birth: "",
-      category: Category.MEMBER,
-      status: Status.ACTIVE,
     },
   });
 
-  async function handleRegisterBeliever(
+  useEffect(() => {
+    if (!!believer && operation == 2) {
+      form.reset(believer?.dataBeliever);
+    }
+  }, []);
+
+  async function handleOnSubmitBeliever(
     values: z.infer<typeof BelieverSchema>
   ) {
-    await BelieverRegister(values);
-    handleReset();
+    try {
+      const response = await Create({ ...values });
+      const believer = await response?.data?.believer;
+      const conf: boolean = confirm(
+        `${believer.name} criado com sucesso ! deseja criar mais algum?`
+      );
+      if (!conf) handleTogoback();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      handleReset();
+    }
+  }
+
+  async function handeleSubmitUpdate(
+    newDataBeliever: z.infer<typeof BelieverSchema>
+  ) {
+    try {
+      const response = await updatedAtBeliever(believer?.id, newDataBeliever);
+      const { believerUpdated } = await response?.data;
+      alert(`${believerUpdated.name} atualizado com sucesso...redirecionando`);
+      handleTogoback();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function handleReset() {
@@ -69,11 +96,7 @@ const CardFormRegister = () => {
       <Card className="bg-card object-cover md:overflow-auto">
         <CardHeader>
           <div className="flex flex-col justify-center items-center space-y-1">
-            <CardTitle>
-              {operation_believer == 1
-                ? "Operação de Cadastro"
-                : "Operação de edição"}
-            </CardTitle>
+            <CardTitle>{titleForm}</CardTitle>
             <CardDescription>Entre com os dados do membro</CardDescription>
             <hr className="w-full" />
           </div>
@@ -82,7 +105,9 @@ const CardFormRegister = () => {
           {/*Formulario de Cadastro */}
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleRegisterBeliever)}
+              onSubmit={form.handleSubmit(
+                operation === 2 ? handeleSubmitUpdate : handleOnSubmitBeliever
+              )}
               className="space-y-1 "
             >
               <FormField
@@ -103,7 +128,7 @@ const CardFormRegister = () => {
                 name="surname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome do Membro:</FormLabel>
+                    <FormLabel>Sobrenome:</FormLabel>
                     <FormControl>
                       <Input placeholder="Sobrenome:" {...field}></Input>
                     </FormControl>
@@ -117,16 +142,17 @@ const CardFormRegister = () => {
                 name="birth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data de Nascimento:</FormLabel>
+                    <FormLabel>Nascimento:</FormLabel>
                     <FormControl>
-                      <InputMask
-                        mask="99/99/9999"
-                        placeholder="dd/MM/yyyy"
-                        className={
-                          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                        }
+                      <PatternFormat
                         {...field}
-                      />
+                        format="##/##/####"
+                        mask={"_"}
+                        defaultValue={
+                          operation === 2 ? believer?.dataBeliever?.birth : ""
+                        }
+                        customInput={Input}
+                      ></PatternFormat>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -142,17 +168,21 @@ const CardFormRegister = () => {
                     <FormControl>
                       <Select
                         {...field}
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={
+                          field.value || operation === 2
+                            ? believer?.dataBeliever?.category
+                            : field.value
+                        }
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Categoria" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="MEMBER">Membro</SelectItem>
-                          <SelectItem value="WORKER">Obreiro</SelectItem>
+                          <SelectItem value="MEMBER">MEMBRO</SelectItem>
+                          <SelectItem value="WORKER">OBREIRO</SelectItem>
                           <SelectItem value="CONGREGATOR">
-                            Congregado
+                            CONGREGADO
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -172,7 +202,11 @@ const CardFormRegister = () => {
                       <Select
                         {...field}
                         onValueChange={field.onChange}
-                        value={field.value}
+                        value={
+                          field.value || operation === 2
+                            ? believer?.dataBeliever?.status
+                            : field.value
+                        }
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Status" />
@@ -191,8 +225,14 @@ const CardFormRegister = () => {
               />
 
               <div className="pt-5 flex flex-row w-full justify-between relative bottom-0 left-0">
-                <Button variant={"outline"}>Voltar</Button>
-                <Button type="submit">Cadastrar</Button>
+                <Button
+                  variant={"outline"}
+                  type="button"
+                  onClick={() => handleTogoback()}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">{textButtonSubmit}</Button>
               </div>
             </form>
           </Form>

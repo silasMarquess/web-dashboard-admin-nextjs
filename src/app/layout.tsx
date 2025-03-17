@@ -1,9 +1,7 @@
-import "dotenv/config";
 import type { Metadata } from "next";
 import FontPopins from "./ui/fonts";
 import "./globals.css";
 import AuthContextProvider from "./contexts/authcontextAdmin";
-import AuthContextUserProvider from "./contexts/authcontextUsers";
 
 export const metadata: Metadata = {
   title: "Create Next App",

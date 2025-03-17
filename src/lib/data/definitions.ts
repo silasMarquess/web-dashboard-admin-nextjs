@@ -7,8 +7,14 @@ export interface User {
 
 export enum Category {
   MEMBER = "MEMBER",
-  CONGRATOR = "CONGREGATOR",
+  CONGREGATOR = "CONGREGATOR",
   WORKER = "WORKER",
+}
+
+export enum CategoryPT {
+  MEMBRRO = "MEMBER",
+  CONGREGADO = "CONGREGATOR",
+  OBREIRO = "WORKER",
 }
 
 export enum Status {
@@ -20,11 +26,11 @@ export interface Believer {
   id: string;
   name: string;
   surname: string;
-  birth: Date;
+  birth: string;
   category: Category;
   status: Status; //true ou false
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type userOmitPassword = Omit<User, "password">;
+export type userOmtPassword = Omit<User, "password">;

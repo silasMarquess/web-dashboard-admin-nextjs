@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserSchema } from "../zodSchemas";
+import { UserSchema } from "./zodSchemas";
 import { redirect } from "next/navigation";
 import instanceAxios from "./axios";
 import { userOmitPassword } from "./definitions";
@@ -10,8 +10,6 @@ const login = async (values: z.infer<typeof UserSchema>) => {
     email: values.email,
     password: values.password,
   };
-
-  console.log(user);
 
   try {
     const response = await fetch(url, {
@@ -37,8 +35,6 @@ const userCreate = async ({
   password,
 }: z.infer<typeof UserSchema>) => {
   const url = "/admin/users";
-  const newUser = { name, email, password };
-  console.log(newUser);
   const response = await instanceAxios.post(url, {
     name,
     email,

@@ -1,6 +1,4 @@
 import FormLoginAdmin from "../../ui/users/formLoginAdmin";
-import { parseCookies } from "nookies";
-import { redirect } from "next/navigation";
 
 const LoginAdminPage = () => {
   return (

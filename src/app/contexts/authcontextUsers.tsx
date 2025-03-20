@@ -55,7 +55,6 @@ export default function AuthContextUserProvider({
     //buscar token
     const response = await login({ email, password });
     const { token, userAutenticated } = await response?.data;
-
     setUser({
       id: userAutenticated.id,
       name: userAutenticated.name,
@@ -64,11 +63,10 @@ export default function AuthContextUserProvider({
 
     setCookie(undefined, "token", token, {
       maxAge: 60 * 60 * 1,
-      path: "/believers",
+      path: "/",
     });
 
     instanceAxios.defaults.headers["authorization"] = `Bearer ${token}`;
-
     //redireionar usuario
     router.push("/believers/list");
   }

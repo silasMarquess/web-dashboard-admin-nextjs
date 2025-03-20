@@ -92,8 +92,8 @@ const CardFormRegister = () => {
   }
 
   return (
-    <div className="flex flex-col shadow-sm rounded-sm object-cover md:max-h-screen md:w-[500px] md:py-5">
-      <Card className="bg-card object-cover md:overflow-auto">
+    <div className="flex flex-col rounded-sm object-cover md:max-h-screen md:w-[500px] md:py-5 shadow-sm shadow-white">
+      <Card className=" border-0 object-cover md:overflow-auto">
         <CardHeader>
           <div className="flex flex-col justify-center items-center space-y-1">
             <CardTitle>{titleForm}</CardTitle>

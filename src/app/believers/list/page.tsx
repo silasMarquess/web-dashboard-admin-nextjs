@@ -166,8 +166,8 @@ const BelieverHome = () => {
   }
 
   useEffect(() => {
-    const { token, token_admin } = parseCookies();
-    if (!token && !token_admin) return router.push("/users/login");
+    const { token } = parseCookies();
+    if (!token) return router.push("/users/login");
 
     const index = async () => {
       try {
@@ -191,7 +191,7 @@ const BelieverHome = () => {
   }
 
   return (
-    <div className="flex flex-col w-screen h-screen items-center justify-start space-y-1 p-2 bg-slate-300">
+    <div className="flex flex-col w-screen h-screen items-center justify-start space-y-1 p-2 bg-slate-100">
       {/*Cabecalho */}
       <div className="flex flex-row w-full md:w-4/5 mt-2 space-x-1 h-auto items-center rounded justify-between">
         <div className="relative flex grow ">
@@ -204,9 +204,13 @@ const BelieverHome = () => {
           ></Input>
           <Search className="absolute left-1 top-1/2 -translate-y-1/2"></Search>
         </div>
-        <Button className="bg-primary rounded-full" onClick={handleRegister}>
+        <Button
+          className="bg-primary"
+          size="icon"
+          onClick={handleRegister}
+          about="Adicionar"
+        >
           <CirclePlus />
-          Adicionar
         </Button>
       </div>
 

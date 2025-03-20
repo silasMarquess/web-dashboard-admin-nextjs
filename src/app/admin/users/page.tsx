@@ -19,10 +19,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CirclePlus, SunMediumIcon, Trash2, UserRoundPen } from "lucide-react";
+import {
+  CirclePlus,
+  SunMediumIcon,
+  Trash2,
+  Undo2,
+  UserRoundPen,
+} from "lucide-react";
 import { parseCookies } from "nookies";
 import { useContext, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import FormRegisterUser from "@/app/ui/users/formRegister";
 import { getALlUsers, getUserById, UserDelete } from "@/lib/data/userAdminCrud";
@@ -96,13 +102,14 @@ export default function PageAdminUsers() {
         <CardContent>
           {/*cabeçalho*/}
           <hr className="w-full"></hr>
-          <div className="flex flex-row w-full h-auto justify-items-end p-2 pt-2 space-y-1">
-            <Button
-              className="bg-primary rounded-full"
-              onClick={handleActiveForm}
-            >
+          <div className="flex flex-row w-full h-auto justify-between items-center p-2 pt-2 space-y-1">
+            <Button className="bg-primary" onClick={handleActiveForm}>
               <CirclePlus />
               Adicionar
+            </Button>
+            <Button onClick={() => redirect("/")}>
+              Sair
+              <Undo2 />
             </Button>
           </div>
           <div className="flex flex-col h-auto w-full object-cover ">

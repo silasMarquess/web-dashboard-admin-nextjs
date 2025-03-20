@@ -43,11 +43,6 @@ const LoginForm = () => {
     },
   });
 
-  useEffect(() => {
-    const { token_admin } = parseCookies();
-    if (!!token_admin) router.push("/believers/list");
-  }, []);
-
   return (
     <Card className="object-cover">
       <CardHeader className="flex flex-col bg-card justify-center items-center">
@@ -92,11 +87,15 @@ const LoginForm = () => {
             />
 
             <div className="flex flex-row w-full h-auto items-center justify-between mt-2">
-              <Button variant={"outline"}>
+              <Button
+                variant={"outline"}
+                type="button"
+                onClick={() => router.push("/")}
+              >
                 <X />
                 Cancelar
               </Button>
-              <Button className="bg-primary focus: bg-blue-600" type="submit">
+              <Button className="bg-primary" type="submit">
                 <Save />
                 Entrar
               </Button>

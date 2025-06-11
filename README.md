@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Visão Geral
 
-## Getting Started
+Projeto de frontEnd de sistema distribuido de controle de informações de membros de uma igreja. Neste projeto de interface o departamento administrativo da 
+Igreja Assembleia de Deus em Senador La-Rocque conseque gerenciar todas informações de seus membros bem como realizar todos os processos internos
+necessário da igreja. O aplicativo é multiplataforma, sendo muito responsivo e se adaptar completamento a qualquer tamanho de tela
 
-First, run the development server:
+## Objetivo
+Aplicativo de frontEnd feito com objetivo de fornecer uma interface de gerenciamento de controle de dados de membros
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Como instalar e rodar
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    git clone https://github.com/silasMarquess/web-app-iot-nextjs.git
+    npm install
+    npm run dev
+##Tecnologias usadas
+- Axios
+- zod
+- React
+- Nextjs
+- TypeScript
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Prints de tela
+[Acessar Prints do App](https://drive.google.com/drive/folders/18p34VQPusCqOJB9J7BueoCyQej357sIT?usp=sharing)

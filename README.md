@@ -9,9 +9,10 @@ Aplicativo de frontEnd feito com objetivo de fornecer uma interface de gerenciam
 
 ## Como instalar e rodar
 
-    git clone https://github.com/silasMarquess/web-app-iot-nextjs.git
+    git clone https://github.com/silasMarquess/web-dashboard-admin-nextjs.git
     npm install
     npm run dev
+    
 ##Tecnologias usadas
 - Axios
 - zod
